@@ -1,0 +1,967 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AQI Forecaster India</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #0b0f1a;
+        --surface: #111827;
+        --surface2: #1a2233;
+        --border: #1e2d45;
+        --text: #e8edf5;
+        --muted: #6b7f99;
+        --accent: #3b82f6;
+        --font-display: "Space Grotesk", sans-serif;
+        --font-body: "Inter", sans-serif;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--font-body);
+        font-size: 15px;
+        line-height: 1.6;
+        min-height: 100vh;
+      }
+
+      /* ── HEADER ── */
+      header {
+        padding: 1.4rem 2rem;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      .logo-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 8px var(--accent);
+      }
+      header h1 {
+        font-family: var(--font-display);
+        font-size: 1.1rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+      }
+      header span {
+        margin-left: auto;
+        font-size: 0.78rem;
+        color: var(--muted);
+      }
+
+      /* ── HERO ── */
+      .hero {
+        text-align: center;
+        padding: 3.5rem 2rem 2rem;
+      }
+      .hero h2 {
+        font-family: var(--font-display);
+        font-size: clamp(1.8rem, 4vw, 2.8rem);
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        line-height: 1.2;
+        margin-bottom: 0.8rem;
+      }
+      .hero h2 em {
+        font-style: normal;
+        color: var(--accent);
+      }
+      .hero p {
+        color: var(--muted);
+        max-width: 480px;
+        margin: 0 auto 2rem;
+        font-size: 0.95rem;
+      }
+
+      /* ── HOW IT WORKS STRIP ── */
+      .how-strip {
+        display: flex;
+        justify-content: center;
+        gap: 0;
+        margin: 0 auto 3rem;
+        max-width: 680px;
+        padding: 0 1.5rem;
+      }
+      .how-step {
+        flex: 1;
+        text-align: center;
+        position: relative;
+        padding: 0 0.5rem;
+      }
+      .how-step:not(:last-child)::after {
+        content: "";
+        position: absolute;
+        top: 18px;
+        right: -4px;
+        width: 50%;
+        height: 1px;
+        background: var(--border);
+      }
+      .how-step:not(:first-child)::before {
+        content: "";
+        position: absolute;
+        top: 18px;
+        left: -4px;
+        width: 50%;
+        height: 1px;
+        background: var(--border);
+      }
+      .step-num {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        color: var(--accent);
+        font-family: var(--font-display);
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 0.6rem;
+        position: relative;
+        z-index: 1;
+      }
+      .how-step p {
+        font-size: 0.75rem;
+        color: var(--muted);
+        line-height: 1.4;
+      }
+      .how-step strong {
+        display: block;
+        font-size: 0.82rem;
+        color: var(--text);
+        font-weight: 500;
+        margin-bottom: 0.2rem;
+      }
+
+      /* ── MAIN CARD ── */
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        max-width: 520px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+
+      .input-label {
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: var(--muted);
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+      }
+
+      .city-input-wrap {
+        display: flex;
+        gap: 0.6rem;
+      }
+      .city-input-wrap input {
+        flex: 1;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        color: var(--text);
+        font-family: var(--font-body);
+        font-size: 1rem;
+        transition: border-color 0.2s;
+        outline: none;
+      }
+      .city-input-wrap input:focus {
+        border-color: var(--accent);
+      }
+      .city-input-wrap input::placeholder {
+        color: var(--muted);
+      }
+
+      .btn-predict {
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 0.75rem 1.4rem;
+        font-family: var(--font-display);
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition:
+          opacity 0.2s,
+          transform 0.1s;
+        white-space: nowrap;
+      }
+      .btn-predict:hover {
+        opacity: 0.88;
+      }
+      .btn-predict:active {
+        transform: scale(0.97);
+      }
+      .btn-predict:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      .hint {
+        margin-top: 0.5rem;
+        font-size: 0.78rem;
+        color: var(--muted);
+      }
+
+      /* ── LOADING ── */
+      #loading {
+        display: none;
+        text-align: center;
+        padding: 2rem 0 1rem;
+        color: var(--muted);
+        font-size: 0.88rem;
+      }
+      .spinner {
+        width: 28px;
+        height: 28px;
+        border: 2.5px solid var(--border);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+        margin: 0 auto 0.8rem;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* ── RESULT ── */
+      #result {
+        display: none;
+        margin-top: 1.5rem;
+      }
+      .result-inner {
+        border-radius: 12px;
+        border: 1.5px solid var(--border);
+        padding: 1.5rem;
+        text-align: center;
+        transition: border-color 0.4s;
+      }
+      .result-city {
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        margin-bottom: 0.5rem;
+      }
+      .result-aqi {
+        font-family: var(--font-display);
+        font-size: 3.8rem;
+        font-weight: 700;
+        line-height: 1;
+        letter-spacing: -0.03em;
+        margin-bottom: 0.3rem;
+      }
+      .result-bucket {
+        font-size: 1.1rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        margin-bottom: 1.2rem;
+      }
+      .result-bar {
+        height: 6px;
+        border-radius: 3px;
+        background: linear-gradient(
+          90deg,
+          #00e400,
+          #92d050,
+          #ffff00,
+          #ff7e00,
+          #ff0000,
+          #99004c
+        );
+        position: relative;
+        margin-bottom: 1rem;
+      }
+      .result-bar-marker {
+        position: absolute;
+        top: -4px;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #fff;
+        border: 2.5px solid #fff;
+        transform: translateX(-50%);
+        transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
+      }
+      .result-advice {
+        font-size: 0.85rem;
+        color: var(--muted);
+        line-height: 1.5;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+      }
+
+      /* ── BREAKDOWN PILLS ── */
+      .breakdown {
+        display: none;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+      }
+      .breakdown-title {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+        margin-bottom: 0.75rem;
+      }
+      .pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      .pill {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0.4rem 0.75rem;
+        font-size: 0.78rem;
+        cursor: pointer;
+        transition: border-color 0.15s;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+      .pill:hover {
+        border-color: var(--accent);
+      }
+      .pill-name {
+        color: var(--muted);
+      }
+      .pill-val {
+        color: var(--text);
+        font-weight: 500;
+      }
+
+      /* ── TOOLTIP MODAL ── */
+      .overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.65);
+        z-index: 100;
+        align-items: flex-end;
+        justify-content: center;
+        padding: 1rem;
+      }
+      .overlay.open {
+        display: flex;
+      }
+      .tooltip-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 1.5rem;
+        max-width: 480px;
+        width: 100%;
+        position: relative;
+      }
+      .tooltip-card h3 {
+        font-family: var(--font-display);
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.4rem;
+      }
+      .tooltip-card .tag {
+        display: inline-block;
+        font-size: 0.72rem;
+        padding: 0.2rem 0.55rem;
+        border-radius: 99px;
+        background: var(--surface2);
+        color: var(--muted);
+        margin-bottom: 0.9rem;
+        border: 1px solid var(--border);
+      }
+      .tooltip-card p {
+        font-size: 0.88rem;
+        color: var(--muted);
+        line-height: 1.65;
+        margin-bottom: 0.8rem;
+      }
+      .tooltip-card p:last-child {
+        margin-bottom: 0;
+      }
+      .tooltip-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        color: var(--muted);
+        border-radius: 8px;
+        padding: 0.3rem 0.6rem;
+        cursor: pointer;
+        font-size: 0.8rem;
+      }
+      .health-row {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-top: 0.8rem;
+      }
+      .health-chip {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.6rem;
+        border-radius: 6px;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        color: var(--text);
+      }
+
+      /* ── GUIDE SECTION ── */
+      .guide {
+        max-width: 520px;
+        margin: 2.5rem auto 0;
+        padding: 0 1rem 4rem;
+      }
+      .guide-title {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        margin-bottom: 1rem;
+        padding-bottom: 0.6rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .guide-item {
+        display: flex;
+        gap: 1rem;
+        padding: 0.9rem 0;
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+      }
+      .guide-item:hover .guide-item-name {
+        color: var(--accent);
+      }
+      .guide-icon {
+        width: 36px;
+        height: 36px;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        flex-shrink: 0;
+      }
+      .guide-item-name {
+        font-weight: 500;
+        font-size: 0.9rem;
+        margin-bottom: 0.2rem;
+        transition: color 0.15s;
+      }
+      .guide-item-desc {
+        font-size: 0.8rem;
+        color: var(--muted);
+      }
+
+      /* ── ERROR ── */
+      .error-msg {
+        display: none;
+        margin-top: 1rem;
+        padding: 0.75rem 1rem;
+        border-radius: 10px;
+        background: rgba(239, 68, 68, 0.08);
+        border: 1px solid rgba(239, 68, 68, 0.25);
+        color: #f87171;
+        font-size: 0.85rem;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo-dot"></div>
+      <h1>AQI Forecaster</h1>
+      <span>India · Powered by ML</span>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero">
+      <h2>How's the air in<br /><em>your city</em> today?</h2>
+      <p>
+        Type any Indian city and get an instant air quality prediction — no
+        technical knowledge needed.
+      </p>
+    </section>
+
+    <!-- HOW IT WORKS STRIP -->
+    <div class="how-strip">
+      <div class="how-step">
+        <div class="step-num">1</div>
+        <strong>Type your city</strong>
+        <p>Just the name, nothing else</p>
+      </div>
+      <div class="how-step">
+        <div class="step-num">2</div>
+        <strong>We fetch live data</strong>
+        <p>Pollution sensors update hourly</p>
+      </div>
+      <div class="how-step">
+        <div class="step-num">3</div>
+        <strong>ML model predicts</strong>
+        <p>Trained on 5 years of data</p>
+      </div>
+      <div class="how-step">
+        <div class="step-num">4</div>
+        <strong>See your result</strong>
+        <p>AQI score + health advice</p>
+      </div>
+    </div>
+
+    <!-- MAIN CARD -->
+    <div class="card" style="max-width: 520px; margin: 0 auto; padding: 2rem">
+      <label class="input-label" for="city-input">Your city</label>
+      <div class="city-input-wrap">
+        <input
+          type="text"
+          id="city-input"
+          placeholder="e.g. Delhi, Mumbai, Hyderabad…"
+          autocomplete="off"
+        />
+        <button class="btn-predict" onclick="predict()">Check AQI</button>
+      </div>
+      <p class="hint">
+        Works for all 26 major Indian cities monitored by CPCB.
+      </p>
+
+      <div id="loading">
+        <div class="spinner"></div>
+        Fetching live pollution data…
+      </div>
+
+      <div class="error-msg" id="error-msg"></div>
+
+      <div id="result">
+        <div class="result-inner" id="result-inner">
+          <div class="result-city" id="result-city"></div>
+          <div class="result-aqi" id="result-aqi"></div>
+          <div class="result-bucket" id="result-bucket"></div>
+          <div class="result-bar">
+            <div class="result-bar-marker" id="bar-marker"></div>
+          </div>
+          <div class="result-advice" id="result-advice"></div>
+
+          <!-- Breakdown pills -->
+          <div class="breakdown" id="breakdown">
+            <div class="breakdown-title">
+              Live pollutant readings — tap any to learn what it means
+            </div>
+            <div class="pills" id="pills"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- POLLUTANT GUIDE -->
+    <div class="guide">
+      <div class="guide-title">Understand the pollutants</div>
+
+      <div class="guide-item" onclick="showInfo('pm25')">
+        <div class="guide-icon">💨</div>
+        <div>
+          <div class="guide-item-name">PM2.5 — Fine particles</div>
+          <div class="guide-item-desc">
+            The most dangerous pollutant. Tiny enough to enter your bloodstream.
+          </div>
+        </div>
+      </div>
+      <div class="guide-item" onclick="showInfo('pm10')">
+        <div class="guide-icon">🌫️</div>
+        <div>
+          <div class="guide-item-name">PM10 — Coarse dust</div>
+          <div class="guide-item-desc">
+            Larger particles from roads, construction, and wind-blown dust.
+          </div>
+        </div>
+      </div>
+      <div class="guide-item" onclick="showInfo('no2')">
+        <div class="guide-icon">🚗</div>
+        <div>
+          <div class="guide-item-name">NO₂ — Nitrogen dioxide</div>
+          <div class="guide-item-desc">
+            Mainly from vehicle exhaust and power plants.
+          </div>
+        </div>
+      </div>
+      <div class="guide-item" onclick="showInfo('o3')">
+        <div class="guide-icon">☀️</div>
+        <div>
+          <div class="guide-item-name">O₃ — Ground-level ozone</div>
+          <div class="guide-item-desc">
+            Forms in sunlight from vehicle fumes. Not the same as the protective
+            ozone layer.
+          </div>
+        </div>
+      </div>
+      <div class="guide-item" onclick="showInfo('co')">
+        <div class="guide-icon">🔥</div>
+        <div>
+          <div class="guide-item-name">CO — Carbon monoxide</div>
+          <div class="guide-item-desc">
+            Invisible, odourless gas from incomplete combustion.
+          </div>
+        </div>
+      </div>
+      <div class="guide-item" onclick="showInfo('so2')">
+        <div class="guide-icon">🏭</div>
+        <div>
+          <div class="guide-item-name">SO₂ — Sulphur dioxide</div>
+          <div class="guide-item-desc">
+            Released by burning coal and oil. Causes acid rain and breathing
+            issues.
+          </div>
+        </div>
+      </div>
+      <div class="guide-item" onclick="showInfo('aqi')">
+        <div class="guide-icon">📊</div>
+        <div>
+          <div class="guide-item-name">What is AQI?</div>
+          <div class="guide-item-desc">
+            The Air Quality Index — a single number that summarises all
+            pollutants.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOOLTIP OVERLAY -->
+    <div class="overlay" id="overlay" onclick="closeOverlay(event)">
+      <div class="tooltip-card" id="tooltip-card">
+        <button class="tooltip-close" onclick="closeInfo()">close</button>
+        <h3 id="tip-title"></h3>
+        <span class="tag" id="tip-tag"></span>
+        <p id="tip-body"></p>
+        <p id="tip-source"></p>
+        <div class="health-row" id="tip-health"></div>
+      </div>
+    </div>
+
+    <script>
+      const CITY_CODES = {
+        ahmedabad: 0,
+        aizawl: 1,
+        amaravati: 2,
+        amritsar: 3,
+        bengaluru: 4,
+        bangalore: 4,
+        bhopal: 5,
+        brajrajnagar: 6,
+        chandigarh: 7,
+        chennai: 8,
+        coimbatore: 9,
+        delhi: 10,
+        ernakulam: 11,
+        gurugram: 12,
+        gurgaon: 12,
+        guwahati: 13,
+        hyderabad: 14,
+        jaipur: 15,
+        jodhpur: 16,
+        kochi: 17,
+        kolkata: 18,
+        lucknow: 19,
+        mumbai: 20,
+        patna: 21,
+        shillong: 22,
+        talcher: 23,
+        thiruvananthapuram: 24,
+        trivandrum: 24,
+        visakhapatnam: 25,
+      };
+
+      const BUCKET_ADVICE = {
+        Good: "Air quality is great today. Enjoy outdoor activities freely.",
+        Satisfactory:
+          "Air is acceptable. Unusually sensitive people may want to limit prolonged outdoor exertion.",
+        Moderate:
+          "Sensitive groups (asthma, elderly, children) should reduce long outdoor activity.",
+        Poor: "Everyone may start to feel health effects. Limit prolonged outdoor activity. Wear a mask if going out.",
+        "Very Poor":
+          "Health alert — everyone may experience serious health effects. Stay indoors, keep windows closed.",
+        Severe:
+          "Emergency conditions. Stay indoors. Avoid all outdoor activity. Vulnerable groups must not go outside.",
+      };
+
+      const BUCKET_COLORS = {
+        Good: "#00e400",
+        Satisfactory: "#92d050",
+        Moderate: "#d4b800",
+        Poor: "#ff7e00",
+        "Very Poor": "#ff0000",
+        Severe: "#99004c",
+      };
+
+      const BUCKET_SCALE = {
+        Good: 0,
+        Satisfactory: 17,
+        Moderate: 34,
+        Poor: 51,
+        "Very Poor": 68,
+        Severe: 85,
+      };
+
+      const POLLUTANT_INFO = {
+        pm25: {
+          title: "PM2.5 — Fine particulate matter",
+          tag: "Most dangerous pollutant",
+          body: "PM2.5 are particles smaller than 2.5 micrometres — about 30 times thinner than a human hair. They are so tiny that they pass through your nose and throat, enter your lungs, and can even get into your bloodstream. Long-term exposure is linked to heart disease, lung cancer, and strokes.",
+          source:
+            "Sources: vehicle exhaust, burning crop stubble, industrial smoke, cooking fires, road dust.",
+          health: ["Heart disease", "Lung cancer", "Stroke", "Asthma attacks"],
+        },
+        pm10: {
+          title: "PM10 — Coarse dust particles",
+          tag: "Road & construction dust",
+          body: "PM10 are particles smaller than 10 micrometres. Larger than PM2.5, they mostly get trapped in the nose and throat, but can still irritate your airways. Common near construction sites, unpaved roads, and areas with heavy truck traffic.",
+          source:
+            "Sources: construction dust, road dust, quarrying, agricultural harvesting.",
+          health: [
+            "Respiratory irritation",
+            "Aggravated asthma",
+            "Reduced lung function",
+          ],
+        },
+        no2: {
+          title: "NO₂ — Nitrogen dioxide",
+          tag: "Vehicle & power plant emissions",
+          body: "Nitrogen dioxide is a reddish-brown gas with a sharp smell. It forms when fuels are burned at high temperatures — mainly in car engines and thermal power plants. At high concentrations it irritates the airways and increases susceptibility to respiratory infections.",
+          source:
+            "Sources: vehicle exhaust, diesel engines, coal power plants, industrial boilers.",
+          health: [
+            "Airway inflammation",
+            "Increased asthma risk",
+            "Lung infections",
+          ],
+        },
+        o3: {
+          title: "O₃ — Ground-level ozone",
+          tag: "Summer smog",
+          body: "Ground-level ozone is not directly emitted — it forms when sunlight reacts with vehicle exhaust and industrial fumes. Despite the same chemical formula as the protective ozone layer high above Earth, ground-level ozone is harmful to breathe. It is worst on hot, sunny, still days.",
+          source:
+            "Sources: not directly emitted — forms from NO₂ and VOCs reacting in sunlight.",
+          health: [
+            "Chest pain",
+            "Throat irritation",
+            "Reduced lung capacity",
+            "Worsened asthma",
+          ],
+        },
+        co: {
+          title: "CO — Carbon monoxide",
+          tag: "Invisible & odourless",
+          body: "Carbon monoxide is a colourless, odourless gas produced when fuels do not burn completely. Indoors it is life-threatening in high concentrations. Outdoors at typical pollution levels it causes headaches, dizziness, and reduces the blood's ability to carry oxygen.",
+          source:
+            "Sources: vehicle engines, generators, burning waste, gas stoves, brick kilns.",
+          health: [
+            "Headache & dizziness",
+            "Reduced oxygen in blood",
+            "Dangerous at high levels",
+          ],
+        },
+        so2: {
+          title: "SO₂ — Sulphur dioxide",
+          tag: "Industrial & coal emissions",
+          body: "Sulphur dioxide has a sharp, choking smell and is released when coal and oil containing sulphur are burned. It reacts with moisture in the air to form sulphuric acid — contributing to acid rain. For people with asthma, even brief exposure can trigger severe breathing difficulty.",
+          source:
+            "Sources: coal-fired power plants, oil refineries, smelting, diesel vehicles.",
+          health: ["Asthma attacks", "Acid rain", "Respiratory inflammation"],
+        },
+        aqi: {
+          title: "AQI — Air Quality Index",
+          tag: "The summary number",
+          body: "The AQI is a single number calculated by India's Central Pollution Control Board (CPCB) that summarises the levels of six pollutants into one easy-to-understand scale from 0 to 500. The higher the number, the worse the air. The AQI takes the worst-performing pollutant on any given day and uses that to set the final score — so even if five pollutants are fine, one bad one will push the AQI up.",
+          source:
+            "Scale: 0–50 Good → 51–100 Satisfactory → 101–200 Moderate → 201–300 Poor → 301–400 Very Poor → 401–500 Severe.",
+          health: [
+            "Good (0–50)",
+            "Satisfactory (51–100)",
+            "Moderate (101–200)",
+            "Poor (201–300)",
+            "Very Poor (301–400)",
+            "Severe (401–500)",
+          ],
+        },
+      };
+
+      function showError(msg) {
+        const el = document.getElementById("error-msg");
+        el.style.display = "block";
+        el.textContent = msg;
+      }
+
+      function clearError() {
+        document.getElementById("error-msg").style.display = "none";
+      }
+
+      async function predict() {
+        const cityInput = document.getElementById("city-input").value.trim();
+        const errorBox = document.getElementById("error-msg");
+        const loading = document.getElementById("loading");
+        const resultDiv = document.getElementById("result");
+
+        errorBox.style.display = "none";
+        resultDiv.style.display = "none";
+
+        if (!cityInput) {
+          errorBox.innerText = "Enter a city name bro 😭";
+          errorBox.style.display = "block";
+          return;
+        }
+
+        try {
+          loading.style.display = "block";
+
+          // STEP 1: fetch AQI features
+          const res1 = await fetch("http://127.0.0.1:5000/get-aqi", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ city: cityInput }), // ✅ FIXED
+          });
+
+          const features = await res1.json();
+
+          if (features.error) throw new Error(features.error);
+
+          // STEP 2: predict
+          const res2 = await fetch("http://127.0.0.1:5000/predict", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(features),
+          });
+
+          const data = await res2.json();
+
+          if (data.error) throw new Error(data.error);
+
+          // ===== DISPLAY RESULT =====
+          document.getElementById("result-city").innerText = cityInput;
+          document.getElementById("result-aqi").innerText = data.aqi;
+          document.getElementById("result-bucket").innerText = data.bucket;
+
+          const inner = document.getElementById("result-inner");
+          inner.style.borderColor = data.color;
+
+          // marker position
+          const marker = document.getElementById("bar-marker");
+          const percent = Math.min((data.aqi / 500) * 100, 100);
+          marker.style.left = percent + "%";
+
+          document.getElementById("result-advice").innerText =
+            BUCKET_ADVICE[data.bucket];
+
+          resultDiv.style.display = "block";
+        } catch (err) {
+          errorBox.innerText =
+            "Something went wrong: " +
+            err.message +
+            ". Make sure Flask is running.";
+          errorBox.style.display = "block";
+        } finally {
+          loading.style.display = "none";
+        }
+      }
+
+      function showResult(data, city, iaqi) {
+        const color = BUCKET_COLORS[data.bucket] || "#888";
+        const advice = BUCKET_ADVICE[data.bucket] || "";
+        const pct = BUCKET_SCALE[data.bucket] ?? 50;
+
+        document.getElementById("result-city").textContent = city;
+        document.getElementById("result-aqi").textContent = data.aqi;
+        document.getElementById("result-aqi").style.color = color;
+        document.getElementById("result-bucket").textContent = data.bucket;
+        document.getElementById("result-bucket").style.color = color;
+        document.getElementById("result-advice").textContent = advice;
+        document.getElementById("result-inner").style.borderColor = color;
+        document.getElementById("bar-marker").style.left = pct + "%";
+        document.getElementById("bar-marker").style.borderColor = color;
+
+        // Build pollutant pills
+        const pillsEl = document.getElementById("pills");
+        pillsEl.innerHTML = "";
+        const readable = {
+          pm25: "PM2.5",
+          pm10: "PM10",
+          no2: "NO₂",
+          o3: "O₃",
+          co: "CO",
+          so2: "SO₂",
+        };
+        const keys = ["pm25", "pm10", "no2", "o3", "co", "so2"];
+        keys.forEach((k) => {
+          const val = iaqi[k]?.v;
+          if (val == null) return;
+          const pill = document.createElement("div");
+          pill.className = "pill";
+          pill.innerHTML = `<span class="pill-name">${readable[k]}</span><span class="pill-val">${val}</span>`;
+          pill.onclick = () => showInfo(k);
+          pillsEl.appendChild(pill);
+        });
+        document.getElementById("breakdown").style.display = pillsEl.children
+          .length
+          ? "block"
+          : "none";
+        document.getElementById("result").style.display = "block";
+      }
+
+      function showInfo(key) {
+        const info = POLLUTANT_INFO[key];
+        if (!info) return;
+        document.getElementById("tip-title").textContent = info.title;
+        document.getElementById("tip-tag").textContent = info.tag;
+        document.getElementById("tip-body").textContent = info.body;
+        document.getElementById("tip-source").textContent = info.source;
+        const hr = document.getElementById("tip-health");
+        hr.innerHTML = info.health
+          .map((h) => `<span class="health-chip">${h}</span>`)
+          .join("");
+        document.getElementById("overlay").classList.add("open");
+      }
+
+      function closeInfo() {
+        document.getElementById("overlay").classList.remove("open");
+      }
+
+      function closeOverlay(e) {
+        if (e.target === document.getElementById("overlay")) closeInfo();
+      }
+
+      document.getElementById("city-input").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") predict();
+      });
+    </script>
+  </body>
+</html>
