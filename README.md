@@ -171,6 +171,7 @@ Ahmedabad · Aizawl · Amaravati · Amritsar · Bengaluru · Bhopal · Brajrajna
 | `models/*.pkl` | Trained model artefacts |
 
 ---
+## Acknowledgements
 
 - [Rohan Rao](https://www.kaggle.com/rohanrao) for the Kaggle dataset
 - [CPCB](https://cpcb.nic.in/) — Central Pollution Control Board of India
